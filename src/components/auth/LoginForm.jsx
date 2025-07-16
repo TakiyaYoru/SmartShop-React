@@ -196,7 +196,7 @@ const LoginForm = () => {
                 Đăng nhập <span className="text-blue-600">SMEMBER</span>
               </h2>
               <p className="text-gray-600 text-lg">
-                Số điện thoại
+                User Name
               </p>
             </div>
 
@@ -227,7 +227,7 @@ const LoginForm = () => {
                             ? 'border-blue-500 bg-blue-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                             : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                       } focus:outline-none placeholder-gray-400`}
-                      placeholder="Nhập số điện thoại của bạn"
+                      placeholder="Nhập user name của bạn"
                       value={formData.username}
                       onChange={handleChange}
                       onFocus={() => setFocusedField('username')}
