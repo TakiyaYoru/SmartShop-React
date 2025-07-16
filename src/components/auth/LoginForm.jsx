@@ -313,7 +313,7 @@ const LoginForm = () => {
                 </div>
 
                 <div className="text-center">
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors hover:underline">
+                  <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors hover:underline">
                     Quên mật khẩu?
                   </a>
                 </div>
