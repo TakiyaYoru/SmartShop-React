@@ -196,7 +196,7 @@ const LoginForm = () => {
                 Đăng nhập <span className="text-blue-600">SMEMBER</span>
               </h2>
               <p className="text-gray-600 text-lg">
-                User Name
+                Hãy đăng nhập để mua sắp thôi
               </p>
             </div>
 
@@ -206,7 +206,7 @@ const LoginForm = () => {
                 {/* Username Field */}
                 <div className="space-y-3">
                   <label htmlFor="username" className="block text-sm font-semibold text-gray-700">
-                    Số điện thoại
+                    User Name
                   </label>
                   <div className="relative group">
                     <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-200 ${
