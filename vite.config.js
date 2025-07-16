@@ -7,4 +7,24 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
-}); 
+  // Cấu hình cho development server
+  server: {
+    host: '0.0.0.0',
+    port: process.env.PORT || 5173,
+  },
+  // Cấu hình cho preview (production)
+  preview: {
+    host: '0.0.0.0',
+    port: process.env.PORT || 4173,
+  },
+  // Cấu hình build
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
+});
