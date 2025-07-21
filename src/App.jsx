@@ -31,6 +31,7 @@ import EditProductPage from './pages/admin/EditProductPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminOrderDetailPage from './pages/admin/AdminOrderDetailPage';
 import CreateOrderPage from './pages/admin/CreateOrderPage';
+import GoogleAuthCallback from './pages/GoogleAuthCallback';
 
 // Protected Routes
 import ProtectedRoute, { AdminRoute, ManagerRoute } from './components/auth/ProtectedRoute';
@@ -56,6 +57,9 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        <Route path="/auth/callback" element={<GoogleAuthCallback />} />
+
         
         <Route 
           path="/products" 

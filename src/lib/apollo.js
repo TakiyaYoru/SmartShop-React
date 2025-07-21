@@ -17,11 +17,18 @@ const PUBLIC_OPERATIONS = [
   'SendMessage',
   'SearchProductsByVoice'
 ];
-
-// Upload link cho file uploads
+/*
+// Link deloy server
 const uploadLink = createUploadLink({
   uri: import.meta.env.VITE_GRAPHQL_URL || 'https://smartshop-backend-8d0k.onrender.com/',
 });
+*/
+
+// Link localhost
+const uploadLink = createUploadLink({
+  uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/',
+});
+
 
 // Auth link để thêm JWT token vào headers
 const authLink = setContext((operation, { headers }) => {

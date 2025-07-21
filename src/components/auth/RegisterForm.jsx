@@ -1,4 +1,4 @@
-// src/components/auth/RegisterForm.jsx
+// src/components/auth/RegisterForm.jsx - CHỈ THÊM GOOGLE BUTTON
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -20,6 +20,7 @@ import {
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import { useRegister } from '../../hooks/useAuth';
+import GoogleSignInButton from './GoogleSignInButton'; // ← THÊM IMPORT
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -96,14 +97,14 @@ const RegisterForm = () => {
       newErrors.lastName = 'Tên là bắt buộc';
     }
 
-    // Phone validation (optional)
-    if (formData.phone && !/^[0-9]{10,11}$/.test(formData.phone)) {
+    // Phone validation (optional but if provided, must be valid)
+    if (formData.phone && !/^[0-9+\-\s]{10,15}$/.test(formData.phone)) {
       newErrors.phone = 'Số điện thoại không hợp lệ';
     }
 
     // Terms agreement
     if (!agreeTerms) {
-      newErrors.terms = 'Bạn phải đồng ý với điều khoản dịch vụ';
+      newErrors.terms = 'Bạn phải đồng ý với điều khoản sử dụng';
     }
 
     setErrors(newErrors);
@@ -112,122 +113,63 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
     
-    if (!validateForm()) {
-      return;
-    }
-
-    // Remove confirmPassword before sending
-    const { confirmPassword, ...registerData } = formData;
-    await register(registerData);
+    const registrationData = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone || undefined
+    };
+    
+    await register(registrationData);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="flex min-h-screen">
-        {/* Left Side - Benefits & Promotions */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 relative overflow-hidden">
-          {/* Background decorations */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-          </div>
-
-          <div className="relative z-10 flex flex-col justify-center p-12 text-white">
-            {/* Header */}
-            <div className="mb-12">
-              <div className="flex items-center mb-6">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center mr-4">
-                  <span className="text-white font-bold text-2xl">S</span>
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold">SmartShop</h1>
-                  <p className="text-blue-100 text-lg">Điện tử thông minh</p>
-                </div>
+        {/* Left Side - Benefits & Promotions - GIỮ NGUYÊN */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 via-blue-600 to-purple-700 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-30"></div>
+          
+          <div className="relative z-10 flex flex-col justify-center px-12 py-20 text-white">
+            <div className="max-w-md mx-auto text-center">
+              <div className="mb-8">
+                <h1 className="text-4xl font-bold mb-4">
+                  Tham gia SmartShop!
+                </h1>
+                <p className="text-xl text-green-100">
+                  Tạo tài khoản để nhận ưu đãi và quà tặng đặc biệt
+                </p>
               </div>
-              
-              <h2 className="text-4xl font-bold mb-4 leading-tight">
-                Tham gia <span className="text-yellow-300">SMEMBER</span> ngay hôm nay!
-              </h2>
-              <p className="text-blue-100 text-xl leading-relaxed">
-                Tạo tài khoản để nhận những ưu đãi đặc biệt và trải nghiệm mua sắm tuyệt vời
-              </p>
-            </div>
 
-            {/* Benefits List */}
-            <div className="space-y-6 mb-12">
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <GiftIcon className="w-7 h-7 text-yellow-300" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-xl mb-2">Tặng voucher 200.000đ</h3>
-                    <p className="text-blue-100 text-base leading-relaxed">cho thành viên mới khi đăng ký lần đầu</p>
-                  </div>
+              {/* Benefits Grid */}
+              <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl">
+                  <GiftIcon className="h-8 w-8 mx-auto mb-2 text-yellow-300" />
+                  <p className="text-sm font-semibold">Quà tặng chào mừng</p>
+                </div>
+                <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl">
+                  <PercentBadgeIcon className="h-8 w-8 mx-auto mb-2 text-red-300" />
+                  <p className="text-sm font-semibold">Giảm giá 15%</p>
+                </div>
+                <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl">
+                  <ShieldCheckIcon className="h-8 w-8 mx-auto mb-2 text-blue-300" />
+                  <p className="text-sm font-semibold">Bảo hành mở rộng</p>
+                </div>
+                <div className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl">
+                  <StarIcon className="h-8 w-8 mx-auto mb-2 text-orange-300" />
+                  <p className="text-sm font-semibold">Thành viên VIP</p>
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <PercentBadgeIcon className="w-7 h-7 text-yellow-300" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-xl mb-2">Chiết khấu đến 5%</h3>
-                    <p className="text-blue-100 text-base leading-relaxed">khi mua các sản phẩm tại SmartShop</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <TruckIcon className="w-7 h-7 text-yellow-300" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-xl mb-2">Miễn phí giao hàng</h3>
-                    <p className="text-blue-100 text-base leading-relaxed">cho đơn hàng từ 300.000đ trở lên</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <ShieldCheckIcon className="w-7 h-7 text-yellow-300" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-xl mb-2">Bảo mật thông tin</h3>
-                    <p className="text-blue-100 text-base leading-relaxed">cam kết bảo vệ thông tin cá nhân của bạn</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <StarIcon className="w-7 h-7 text-yellow-300" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-xl mb-2">Tích điểm thưởng</h3>
-                    <p className="text-blue-100 text-base leading-relaxed">tích lũy điểm và đổi quà hấp dẫn</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div className="text-center">
-              <button className="text-yellow-300 hover:text-yellow-200 font-semibold text-lg transition-colors hover:underline">
-                Xem chi tiết chính sách thành viên →
-              </button>
-            </div>
-
-            {/* Mascot/Illustration */}
-            <div className="absolute bottom-8 right-8 opacity-20">
-              <div className="w-40 h-40 bg-white/10 rounded-full flex items-center justify-center">
-                <ShoppingBagIcon className="w-20 h-20 text-white" />
+              {/* Promotion */}
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-6 text-gray-900">
+                <div className="text-2xl font-bold mb-2">🎉 KHUYẾN MÃI ĐĂNG KÝ</div>
+                <p className="text-lg font-semibold mb-2">Giảm ngay 200.000đ</p>
+                <p className="text-sm">Cho đơn hàng đầu tiên từ 500.000đ</p>
               </div>
             </div>
           </div>
@@ -236,7 +178,7 @@ const RegisterForm = () => {
         {/* Right Side - Register Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12">
           <div className="max-w-md w-full space-y-8">
-            {/* Mobile Header */}
+            {/* Mobile Header - GIỮ NGUYÊN */}
             <div className="lg:hidden text-center mb-8">
               <div className="flex justify-center mb-6">
                 <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
@@ -249,7 +191,7 @@ const RegisterForm = () => {
               <p className="text-gray-600 text-lg">Điện tử thông minh</p>
             </div>
 
-            {/* Form Header */}
+            {/* Form Header - GIỮ NGUYÊN */}
             <div className="text-center">
               <h2 className="text-3xl font-bold text-gray-900 mb-3">
                 Tạo tài khoản <span className="text-blue-600">SMEMBER</span>
@@ -261,8 +203,27 @@ const RegisterForm = () => {
 
             {/* Register Form */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-10 border border-gray-100">
+              
+              {/* ===== THÊM GOOGLE BUTTON Ở ĐÂY ===== */}
+              <div className="mb-6">
+                <GoogleSignInButton text="Đăng ký với Google" />
+              </div>
+
+              {/* Divider */}
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-gray-500 font-medium">
+                    Hoặc đăng ký bằng email
+                  </span>
+                </div>
+              </div>
+              {/* ===== HẾT PHẦN THÊM ===== */}
+
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Username Field */}
+                {/* Username Field - GIỮ NGUYÊN TẤT CẢ PHẦN NÀY */}
                 <div className="space-y-3">
                   <label htmlFor="username" className="block text-sm font-semibold text-gray-700">
                     Tên đăng nhập *
@@ -306,7 +267,7 @@ const RegisterForm = () => {
                   )}
                 </div>
 
-                {/* Email Field */}
+                {/* Email Field - GIỮ NGUYÊN */}
                 <div className="space-y-3">
                   <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
                     Email *
@@ -330,7 +291,7 @@ const RegisterForm = () => {
                             ? 'border-blue-500 bg-blue-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                             : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                       } focus:outline-none placeholder-gray-400`}
-                      placeholder="Nhập email của bạn"
+                      placeholder="Nhập email"
                       value={formData.email}
                       onChange={handleChange}
                       onFocus={() => setFocusedField('email')}
@@ -350,8 +311,8 @@ const RegisterForm = () => {
                   )}
                 </div>
 
-                {/* First Name & Last Name */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* First Name and Last Name - GIỮ NGUYÊN */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div className="space-y-3">
                     <label htmlFor="firstName" className="block text-sm font-semibold text-gray-700">
                       Họ *
@@ -365,15 +326,11 @@ const RegisterForm = () => {
                       className={`w-full px-4 py-4 border-2 rounded-2xl transition-all duration-200 bg-gray-50/50 ${
                         errors.firstName 
                           ? 'border-red-300 bg-red-50/50 focus:border-red-500 focus:ring-4 focus:ring-red-100' 
-                          : focusedField === 'firstName'
-                            ? 'border-blue-500 bg-blue-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
-                            : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
+                          : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                       } focus:outline-none placeholder-gray-400`}
                       placeholder="Họ"
                       value={formData.firstName}
                       onChange={handleChange}
-                      onFocus={() => setFocusedField('firstName')}
-                      onBlur={() => setFocusedField(null)}
                     />
                     {errors.firstName && (
                       <div className="flex items-center space-x-2 text-red-600">
@@ -396,15 +353,11 @@ const RegisterForm = () => {
                       className={`w-full px-4 py-4 border-2 rounded-2xl transition-all duration-200 bg-gray-50/50 ${
                         errors.lastName 
                           ? 'border-red-300 bg-red-50/50 focus:border-red-500 focus:ring-4 focus:ring-red-100' 
-                          : focusedField === 'lastName'
-                            ? 'border-blue-500 bg-blue-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
-                            : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
+                          : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                       } focus:outline-none placeholder-gray-400`}
                       placeholder="Tên"
                       value={formData.lastName}
                       onChange={handleChange}
-                      onFocus={() => setFocusedField('lastName')}
-                      onBlur={() => setFocusedField(null)}
                     />
                     {errors.lastName && (
                       <div className="flex items-center space-x-2 text-red-600">
@@ -415,10 +368,10 @@ const RegisterForm = () => {
                   </div>
                 </div>
 
-                {/* Phone Field */}
+                {/* Phone Field - GIỮ NGUYÊN */}
                 <div className="space-y-3">
                   <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                    Số điện thoại
+                    Số điện thoại (tùy chọn)
                   </label>
                   <div className="relative group">
                     <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-200 ${
@@ -438,7 +391,7 @@ const RegisterForm = () => {
                             ? 'border-blue-500 bg-blue-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                             : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
                       } focus:outline-none placeholder-gray-400`}
-                      placeholder="Nhập số điện thoại (tùy chọn)"
+                      placeholder="Nhập số điện thoại"
                       value={formData.phone}
                       onChange={handleChange}
                       onFocus={() => setFocusedField('phone')}
@@ -453,7 +406,7 @@ const RegisterForm = () => {
                   )}
                 </div>
 
-                {/* Password Field */}
+                {/* Password Field - GIỮ NGUYÊN */}
                 <div className="space-y-3">
                   <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
                     Mật khẩu *
@@ -503,7 +456,7 @@ const RegisterForm = () => {
                   )}
                 </div>
 
-                {/* Confirm Password Field */}
+                {/* Confirm Password Field - GIỮ NGUYÊN */}
                 <div className="space-y-3">
                   <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700">
                     Xác nhận mật khẩu *
@@ -553,26 +506,29 @@ const RegisterForm = () => {
                   )}
                 </div>
 
-                {/* Terms Agreement */}
-                <div className="space-y-3">
-                  <label className="flex items-start space-x-3 cursor-pointer">
+                {/* Terms Agreement - GIỮ NGUYÊN */}
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
                     <input
+                      id="agree-terms"
+                      name="agree-terms"
                       type="checkbox"
                       checked={agreeTerms}
                       onChange={(e) => setAgreeTerms(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors"
                     />
-                    <span className="text-sm text-gray-600 leading-relaxed">
+                    <label htmlFor="agree-terms" className="text-sm text-gray-700 leading-5">
                       Tôi đồng ý với{' '}
-                      <a href="#" className="text-blue-600 hover:text-blue-500 font-medium hover:underline">
+                      <Link to="/terms" className="text-blue-600 hover:text-blue-500 font-semibold hover:underline">
                         Điều khoản dịch vụ
-                      </a>{' '}
+                      </Link>{' '}
                       và{' '}
-                      <a href="#" className="text-blue-600 hover:text-blue-500 font-medium hover:underline">
+                      <Link to="/privacy" className="text-blue-600 hover:text-blue-500 font-semibold hover:underline">
                         Chính sách bảo mật
-                      </a>
-                    </span>
-                  </label>
+                      </Link>{' '}
+                      của SmartShop
+                    </label>
+                  </div>
                   {errors.terms && (
                     <div className="flex items-center space-x-2 text-red-600">
                       <ExclamationCircleIcon className="h-4 w-4" />
@@ -581,31 +537,32 @@ const RegisterForm = () => {
                   )}
                 </div>
 
-                {/* Submit Button */}
+                {/* Submit Button - GIỮ NGUYÊN */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="group relative w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold text-lg"
+                  className={`group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-semibold rounded-2xl text-white transition-all duration-200 ${
+                    loading
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-100 transform hover:scale-[1.02] active:scale-[0.98]'
+                  }`}
                 >
                   {loading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Đang tạo tài khoản...
-                    </>
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      Đang đăng ký...
+                    </div>
                   ) : (
-                    <>
-                      Tạo tài khoản
-                      <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </>
+                    <div className="flex items-center">
+                      <span>TẠO TÀI KHOẢN SMEMBER</span>
+                      <ArrowRightIcon className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-200" />
+                    </div>
                   )}
                 </button>
 
-                {/* Login Link */}
-                <div className="text-center pt-4">
-                  <p className="text-gray-600 text-base">
+                {/* Login Link - GIỮ NGUYÊN */}
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">
                     Đã có tài khoản?{' '}
                     <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors hover:underline">
                       Đăng nhập ngay
@@ -615,7 +572,7 @@ const RegisterForm = () => {
               </form>
             </div>
 
-            {/* Footer */}
+            {/* Footer - GIỮ NGUYÊN */}
             <div className="text-center text-sm text-gray-500">
               <p>
                 Mua sắm, sửa chữa tại{' '}

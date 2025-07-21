@@ -1,6 +1,7 @@
 // webfrontend/src/router.jsx - Complete with Admin Orders Routes
 
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
+import GoogleAuthCallback from './pages/GoogleAuthCallback';
 
 // ===== CUSTOMER PAGES =====
 import LoginPage from './pages/LoginPage';
@@ -16,6 +17,7 @@ import OrderDetailPage from './pages/OrderDetailPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import ReviewPage from './pages/ReviewPage';
 import NotFoundPage from './pages/NotFoundPage';
+import WelcomePage from './pages/WelcomePage';
 
 // ===== ADMIN COMPONENTS =====
 import AdminLayout from './components/admin/AdminLayout';
@@ -50,6 +52,8 @@ const routes = createRoutesFromElements(
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+    <Route path="/auth/callback" element={<GoogleAuthCallback />} />
+
     
     {/* ===== PUBLIC PAGES ===== */}
     <Route path="/" element={<HomePage />} />
@@ -109,6 +113,15 @@ const routes = createRoutesFromElements(
           <ReviewPage />
         </ProtectedRoute>
       } 
+    />
+
+    <Route 
+      path="/welcome" 
+      element={
+        <ProtectedRoute>
+          <WelcomePage />
+        </ProtectedRoute>
+      }
     />
     
     {/* ===== ADMIN ROUTES ===== */}
