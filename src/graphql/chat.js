@@ -36,6 +36,27 @@ export const SEND_MESSAGE = gql`
         targetUser
         keywords
       }
+      mode
+      addToCompare {
+        _id
+        name
+        description
+        price
+        originalPrice
+        images
+        stock
+        isActive
+        isFeatured
+        brand {
+          _id
+          name
+        }
+        category {
+          _id
+          name
+        }
+      }
+      shouldCompare
     }
   }
 `;

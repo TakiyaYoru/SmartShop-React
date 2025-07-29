@@ -155,7 +155,7 @@ export const CartProvider = ({ children }) => {
       console.log('Cart data loaded:', data);
       dispatch({
         type: CART_ACTIONS.SET_CART,
-        payload: data?.getMyCart
+        payload: data?.getCart
       });
     },
     onError: (error) => {

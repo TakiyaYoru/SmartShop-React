@@ -49,10 +49,10 @@ export const CART_SUMMARY_FRAGMENT = gql`
 export const GET_CART = gql`
   query GetCart {
     getCart {
-      ...CartSummaryData
+      ...CartItemData
     }
   }
-  ${CART_SUMMARY_FRAGMENT}
+  ${CART_ITEM_FRAGMENT}
 `;
 
 // Query để lấy số lượng items trong cart (cho badge)

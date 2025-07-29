@@ -6,7 +6,8 @@ import {
   EyeIcon,
   SparklesIcon,
   TagIcon,
-  TruckIcon
+  TruckIcon,
+  ScaleIcon
 } from '@heroicons/react/24/outline';
 import { 
   HeartIcon as HeartSolidIcon
@@ -20,7 +21,8 @@ const ProductCard = ({
   product, 
   viewMode = 'grid',
   showQuickActions = true,
-  className = '' 
+  className = '',
+  onCompareClick
 }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -90,6 +92,15 @@ const ProductCard = ({
     console.log('Quick view for product:', _id);
   };
 
+  // Compare handler
+  const handleCompareClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onCompareClick) {
+      onCompareClick(product);
+    }
+  };
+
   const cardClassName = `
     bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden
     hover:shadow-xl hover:border-gray-300 transition-all duration-300
@@ -153,6 +164,14 @@ const ProductCard = ({
                 className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-colors"
               >
                 <EyeIcon className="w-4 h-4 text-gray-600" />
+              </button>
+              
+              <button
+                onClick={handleCompareClick}
+                className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-colors"
+                title="Thêm vào so sánh"
+              >
+                <ScaleIcon className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           )}

@@ -12,8 +12,10 @@ import {
   Squares2X2Icon, 
   ListBulletIcon,
   XMarkIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  ScaleIcon
 } from '@heroicons/react/24/outline';
+import ProductComparisonModal from '../components/products/ProductComparisonModal';
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,6 +52,10 @@ const ProductsPage = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
+
+  // Product comparison state
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [showComparisonModal, setShowComparisonModal] = useState(false);
 
   // Get initial search from URL
   const initialSearch = searchParams.get('q') || '';
@@ -279,6 +285,33 @@ const ProductsPage = () => {
     }
   };
 
+  // Product comparison handlers
+  const handleAddToComparison = (product) => {
+    if (selectedProducts.length >= 3) {
+      alert('Bạn chỉ có thể so sánh tối đa 3 sản phẩm');
+      return;
+    }
+    
+    if (selectedProducts.find(p => p._id === product._id)) {
+      alert('Sản phẩm này đã được thêm vào so sánh');
+      return;
+    }
+    
+    setSelectedProducts(prev => [...prev, product]);
+  };
+
+  const handleRemoveFromComparison = (productId) => {
+    setSelectedProducts(prev => prev.filter(p => p._id !== productId));
+  };
+
+  const handleOpenComparison = () => {
+    if (selectedProducts.length < 2) {
+      alert('Cần ít nhất 2 sản phẩm để so sánh');
+      return;
+    }
+    setShowComparisonModal(true);
+  };
+
   // Clear all filters
   const clearAllFilters = () => {
     setFilters({
@@ -462,6 +495,20 @@ const ProductsPage = () => {
                     <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
                 </button>
+
+                {/* Comparison Button */}
+                {selectedProducts.length > 0 && (
+                  <button
+                    onClick={handleOpenComparison}
+                    className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-medium transition-colors"
+                  >
+                    <ScaleIcon className="h-4 w-4" />
+                    <span className="hidden sm:inline">So sánh</span>
+                    <span className="bg-white text-purple-600 px-2 py-0.5 rounded-full text-xs font-bold">
+                      {selectedProducts.length}
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -570,6 +617,7 @@ const ProductsPage = () => {
                 showLoadMore={false}
                 hasNextPage={currentPage < totalPages}
                 loadingMore={false}
+                onCompareClick={handleAddToComparison}
               />
 
               {/* Pagination */}
@@ -627,6 +675,14 @@ const ProductsPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Product Comparison Modal */}
+        <ProductComparisonModal
+          isOpen={showComparisonModal}
+          onClose={() => setShowComparisonModal(false)}
+          selectedProducts={selectedProducts}
+          onProductSelect={setSelectedProducts}
+        />
       </div>
     </Layout>
   );

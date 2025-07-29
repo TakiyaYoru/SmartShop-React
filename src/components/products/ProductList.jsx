@@ -9,7 +9,8 @@ const ProductList = ({
   showLoadMore = false,
   onLoadMore,
   hasNextPage = false,
-  loadingMore = false 
+  loadingMore = false,
+  onCompareClick
 }) => {
   
   // Filter out null/undefined products and validate data
@@ -90,6 +91,7 @@ const ProductList = ({
             key={product._id} 
             product={product} 
             viewMode={viewMode}
+            onCompareClick={onCompareClick}
           />
         ))}
       </div>

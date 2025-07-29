@@ -1,0 +1,19 @@
+{
+  "watch": [
+    "server.js",
+    "src/**/*.js",
+    "src/**/*.jsx"
+  ],
+  "ext": "js,jsx,json",
+  "ignore": [
+    "node_modules/**/*",
+    "dist/**/*",
+    "public/**/*"
+  ],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "exec": "node server.js",
+  "legacyWatch": true,
+  "delay": 1000
+} 
