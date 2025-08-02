@@ -35,6 +35,9 @@ import CreateOrderPage from './pages/admin/CreateOrderPage';
 // ✅ THÊM MỚI: Admin Reviews Component
 import AdminReviewsPage from './pages/admin/AdminReviewsPage';
 
+// ✅ THÊM MỚI: Admin Reports Component
+import ReportsPage from './pages/admin/ReportsPage';
+
 // ===== PROTECTED ROUTES =====
 import ProtectedRoute, { AdminRoute, ManagerRoute } from './components/auth/ProtectedRoute';
 
@@ -207,23 +210,7 @@ const routes = createRoutesFromElements(
         </div>
       } />
       
-      <Route path="reports" element={
-        <div className="p-6">
-          <h1 className="text-2xl font-bold mb-4">Reports & Analytics</h1>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600">Reports and analytics will be implemented soon! 📊</p>
-            <div className="mt-4 text-sm text-gray-500">
-              <p>Features sẽ có:</p>
-              <ul className="list-disc list-inside mt-2">
-                <li>Báo cáo doanh thu</li>
-                <li>Thống kê sản phẩm bán chạy</li>
-                <li>Phân tích khách hàng</li>
-                <li>Dashboard analytics</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      } />
+      <Route path="reports" element={<ReportsPage />} />
       
       <Route path="settings" element={
         <div className="p-6">

@@ -101,6 +101,12 @@ const Sidebar = ({
       ]
     },
     {
+      name: 'Báo cáo', // 🆕 NEW REPORTS SECTION
+      icon: ChartBarIcon,
+      href: '/admin/reports',
+      current: location.pathname === '/admin/reports'
+    },
+    {
       name: 'Đánh giá', // 🆕 NEW REVIEWS SECTION
       href: '/admin/reviews',
       icon: StarIcon,
@@ -123,12 +129,6 @@ const Sidebar = ({
       href: '/admin/users',
       icon: UserGroupIcon,
       current: location.pathname === '/admin/users'
-    },
-    {
-      name: 'Báo cáo',
-      href: '/admin/reports',
-      icon: ChartBarIcon,
-      current: location.pathname === '/admin/reports'
     },
     {
       name: 'Cài đặt',
