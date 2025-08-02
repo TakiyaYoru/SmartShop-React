@@ -1,7 +1,7 @@
 // webfrontend/src/pages/OrdersPage.jsx - ENHANCED WITH CANCEL & PROPER IMAGES
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { 
   ShoppingBagIcon, 
@@ -19,7 +19,8 @@ import {
   PhoneIcon,
   MapPinIcon,
   ChatBubbleLeftIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
 
@@ -35,6 +36,7 @@ import {
 } from '../graphql/orders';
 
 const OrdersPage = () => {
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   const [orderBy, setOrderBy] = useState('DATE_DESC');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -50,7 +52,8 @@ const OrdersPage = () => {
       orderBy: orderBy
     },
     errorPolicy: 'all',
-    notifyOnNetworkStatusChange: true
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network' // Luôn fetch từ network khi có thể
   });
 
   // Cancel order mutation
@@ -73,6 +76,42 @@ const OrdersPage = () => {
   const totalCount = data?.getMyOrders?.totalCount || 0;
   const hasNextPage = data?.getMyOrders?.hasNextPage || false;
   const hasPreviousPage = data?.getMyOrders?.hasPreviousPage || false;
+  const isRefreshing = loading && !data; // Chỉ hiển thị loading khi chưa có data
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+
+  // Refresh data when component mounts or when returning to this page
+  useEffect(() => {
+    // Refresh data when component mounts
+    refetch();
+    
+    // Refresh data when window gains focus (user returns to tab)
+    const handleFocus = () => {
+      console.log('Window focused, refreshing orders data...');
+      refetch().then(() => {
+        setLastUpdated(new Date());
+        toast.success('Đã cập nhật danh sách đơn hàng!');
+      });
+    };
+
+    // Refresh data when user navigates back to this page
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('Page became visible, refreshing orders data...');
+        refetch().then(() => {
+          setLastUpdated(new Date());
+          toast.success('Đã cập nhật danh sách đơn hàng!');
+        });
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [refetch, location.pathname]); // Re-run when location changes
 
   // Filter orders
   const filteredOrders = orders.filter(order => {
@@ -499,7 +538,7 @@ const OrdersPage = () => {
     </div>
   );
 
-  if (loading) {
+  if (isRefreshing) {
     return (
       <ProtectedRoute>
         <Layout>
@@ -529,17 +568,49 @@ const OrdersPage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="mb-8">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <ShoppingBagIcon className="h-8 w-8 text-white" />
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <ShoppingBagIcon className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <h1 className="text-4xl font-bold text-gray-900">
+                        Đơn hàng của tôi
+                      </h1>
+                      {loading && data && (
+                        <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                          <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          <span>Đang cập nhật...</span>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-lg text-gray-600 mt-1">
+                      Theo dõi và quản lý tất cả đơn hàng của bạn
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-4xl font-bold text-gray-900">
-                    Đơn hàng của tôi
-                  </h1>
-                  <p className="text-lg text-gray-600 mt-1">
-                    Theo dõi và quản lý tất cả đơn hàng của bạn
-                  </p>
+                
+                {/* Manual Refresh Button */}
+                <div className="flex items-center gap-4">
+                  <div className="text-xs text-gray-500">
+                    Cập nhật lúc: {lastUpdated.toLocaleTimeString('vi-VN')}
+                  </div>
+                  <button
+                    onClick={() => {
+                      console.log('Manual refresh triggered');
+                      refetch().then(() => {
+                        setLastUpdated(new Date());
+                        toast.success('Đã cập nhật danh sách đơn hàng!');
+                      });
+                    }}
+                    disabled={loading}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                    title="Làm mới dữ liệu"
+                  >
+                    <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    <span>Làm mới</span>
+                  </button>
                 </div>
               </div>
 

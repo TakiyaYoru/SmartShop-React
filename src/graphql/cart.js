@@ -49,10 +49,10 @@ export const CART_SUMMARY_FRAGMENT = gql`
 export const GET_CART = gql`
   query GetCart {
     getCart {
-      ...CartItemData
+      ...CartSummaryData
     }
   }
-  ${CART_ITEM_FRAGMENT}
+  ${CART_SUMMARY_FRAGMENT}
 `;
 
 // Query để lấy số lượng items trong cart (cho badge)
@@ -64,7 +64,7 @@ export const GET_CART_ITEM_COUNT = gql`
 
 // Mutation thêm vào giỏ hàng
 export const ADD_TO_CART = gql`
-  mutation AddToCart($input: AddToCartInput!) {
+  mutation AddToCart($input: CartInput!) {
     addToCart(input: $input) {
       ...CartItemData
     }

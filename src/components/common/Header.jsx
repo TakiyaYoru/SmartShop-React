@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWishlist } from '../../contexts/WishlistContext';
 import CartIcon from '../cart/CartIcon'; // Import CartIcon
 import {
   MagnifyingGlassIcon,
@@ -23,6 +24,9 @@ const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Wishlist context
+  const { itemCount: wishlistCount } = useWishlist();
 
   const handleLogout = () => {
     if (window.confirm('Bạn có chắc muốn đăng xuất?')) {
@@ -131,10 +135,18 @@ const Header = () => {
                   <BellIcon className="h-5 w-5" />
                 </button>
 
-                {/* Wishlist (if needed) */}
-                <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                {/* Wishlist Icon */}
+                <Link
+                  to="/wishlist"
+                  className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                >
                   <HeartIcon className="h-5 w-5" />
-                </button>
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {wishlistCount > 99 ? '99+' : wishlistCount}
+                    </span>
+                  )}
+                </Link>
 
                 {/* Admin Panel Link - cho admin/manager */}
                 {(user?.role === 'admin' || user?.role === 'manager') && (

@@ -2,19 +2,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  HeartIcon, 
   EyeIcon,
   SparklesIcon,
   TagIcon,
   TruckIcon,
   ScaleIcon
 } from '@heroicons/react/24/outline';
-import { 
-  HeartIcon as HeartSolidIcon
-} from '@heroicons/react/24/solid';
 import { formatPrice, calculateDiscountPercentage } from '../../lib/utils';
 import { getImageUrl, SmartImage } from '../../utils/imageHelper'; // ✅ UPDATED IMPORT
 import AddToCartButton from '../cart/AddToCartButton';
+import WishlistButton from './WishlistButton';
 import ProductRating from '../reviews/ProductRating';
 
 const ProductCard = ({ 
@@ -77,12 +74,7 @@ const ProductCard = ({
 
   const stockStatus = getStockStatus();
 
-  // Toggle wishlist
-  const handleWishlistToggle = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-  };
+
 
   // Quick view handler
   const handleQuickView = (e) => {
@@ -148,16 +140,11 @@ const ProductCard = ({
             <div className={`absolute top-3 right-3 flex flex-col gap-2 transition-opacity duration-300 ${
               isHovered ? 'opacity-100' : 'opacity-0'
             }`}>
-              <button
-                onClick={handleWishlistToggle}
-                className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-colors"
-              >
-                {isWishlisted ? (
-                  <HeartSolidIcon className="w-4 h-4 text-red-500" />
-                ) : (
-                  <HeartIcon className="w-4 h-4 text-gray-600" />
-                )}
-              </button>
+              <WishlistButton 
+                productId={_id}
+                size="sm"
+                className="w-8 h-8 bg-white/90 hover:bg-white rounded-full shadow-lg"
+              />
               
               <button
                 onClick={handleQuickView}

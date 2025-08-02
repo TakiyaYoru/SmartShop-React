@@ -17,8 +17,10 @@ import CheckoutPage from './pages/CheckoutPage';
 import OrdersPage from './pages/OrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
+import WishlistPage from './pages/WishlistPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ChatTest from './components/chat/ChatTest';
+import ProductSpecificationsDemo from './components/products/ProductSpecificationsDemo';
 
 // Admin Components
 import AdminLayout from './components/admin/AdminLayout';
@@ -45,6 +47,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/chat-test" element={<ChatTest />} />
+        <Route path="/specs-demo" element={<ProductSpecificationsDemo />} />
         
         {/* ===== PROTECTED CUSTOMER ROUTES ===== */}
         <Route 
@@ -133,6 +136,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <OrderSuccessPage />
+              </Layout>
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/wishlist" 
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <WishlistPage />
               </Layout>
             </ProtectedRoute>
           } 

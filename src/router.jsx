@@ -15,6 +15,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import OrdersPage from './pages/OrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
+import WishlistPage from './pages/WishlistPage';
 import ReviewPage from './pages/ReviewPage';
 import NotFoundPage from './pages/NotFoundPage';
 import WelcomePage from './pages/WelcomePage';
@@ -102,6 +103,15 @@ const routes = createRoutesFromElements(
       element={
         <ProtectedRoute>
           <OrderSuccessPage />
+        </ProtectedRoute>
+      } 
+    />
+
+    <Route 
+      path="/wishlist" 
+      element={
+        <ProtectedRoute>
+          <WishlistPage />
         </ProtectedRoute>
       } 
     />

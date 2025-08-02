@@ -1,12 +1,13 @@
 // webfrontend/src/pages/CartPage.jsx - FINAL PRODUCTION VERSION
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import Layout from '../components/common/Layout';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useQuery } from '@apollo/client';
 import { GET_CART } from '../graphql/cart';
+import { toast } from 'react-hot-toast';
 import { 
   ShoppingCartIcon, 
   ArrowLeftIcon,
@@ -15,12 +16,15 @@ import {
   PlusIcon,
   TrashIcon,
   HeartIcon,
-  GiftIcon
+  GiftIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 const CartPage = () => {
   const cartData = useCart();
   const authData = useAuth();
+  const location = useLocation();
+  const [lastUpdated, setLastUpdated] = useState(new Date());
   
   // Intelligent data extraction
   const possibleItems = [
@@ -51,9 +55,11 @@ const CartPage = () => {
   }
 
   // Fallback: use direct query if context has no data
-  const { data: directCartData } = useQuery(GET_CART, {
+  const { data: directCartData, refetch: refetchCart } = useQuery(GET_CART, {
     skip: !authData.isAuthenticated,
-    errorPolicy: 'all'
+    errorPolicy: 'all',
+    fetchPolicy: 'cache-and-network', // Luôn fetch từ network khi có thể
+    notifyOnNetworkStatusChange: true // Thông báo khi network status thay đổi
   });
 
   if (isEmpty && directCartData?.getCart?.items) {
@@ -64,6 +70,44 @@ const CartPage = () => {
   }
 
   const isLoading = cartData?.loading || cartData?.isLoading || false;
+
+  // Refresh data when component mounts or when returning to this page
+  useEffect(() => {
+    // Refresh data when component mounts
+    if (authData.isAuthenticated) {
+      refetchCart();
+    }
+    
+    // Refresh data when window gains focus (user returns to tab)
+    const handleFocus = () => {
+      if (authData.isAuthenticated) {
+        console.log('Window focused, refreshing cart data...');
+        refetchCart().then(() => {
+          setLastUpdated(new Date());
+          toast.success('Đã cập nhật giỏ hàng!');
+        });
+      }
+    };
+
+    // Refresh data when user navigates back to this page
+    const handleVisibilityChange = () => {
+      if (!document.hidden && authData.isAuthenticated) {
+        console.log('Page became visible, refreshing cart data...');
+        refetchCart().then(() => {
+          setLastUpdated(new Date());
+          toast.success('Đã cập nhật giỏ hàng!');
+        });
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [refetchCart, location.pathname, authData.isAuthenticated]); // Re-run when location changes
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -132,29 +176,62 @@ const CartPage = () => {
                   Tiếp tục mua sắm
                 </Link>
                 <div className="h-6 w-px bg-gray-300 hidden sm:block" />
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  <ShoppingCartIcon className="w-7 h-7 sm:w-8 sm:h-8" />
-                  Giỏ hàng
-                  {!isEmpty && totalItems > 0 && (
-                    <span className="bg-blue-100 text-blue-800 text-sm sm:text-lg font-semibold px-2 sm:px-3 py-1 rounded-full">
-                      {totalItems}
-                    </span>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <ShoppingCartIcon className="w-7 h-7 sm:w-8 sm:h-8" />
+                    Giỏ hàng
+                    {!isEmpty && totalItems > 0 && (
+                      <span className="bg-blue-100 text-blue-800 text-sm sm:text-lg font-semibold px-2 sm:px-3 py-1 rounded-full">
+                        {totalItems}
+                      </span>
+                    )}
+                  </h1>
+                  {isLoading && !isEmpty && (
+                    <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      <span>Đang cập nhật...</span>
+                    </div>
                   )}
-                </h1>
+                </div>
               </div>
 
-              {/* Clear Cart Button */}
-              {!isEmpty && (
-                <button
-                  onClick={handleClearCart}
-                  disabled={isLoading}
-                  className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 border border-red-200"
-                >
-                  <TrashIcon className="w-4 h-4" />
-                  <span className="hidden sm:inline">Xóa tất cả</span>
-                  <span className="sm:hidden">Xóa</span>
-                </button>
-              )}
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                {/* Manual Refresh Button */}
+                <div className="flex items-center gap-2">
+                  <div className="text-xs text-gray-500 hidden sm:block">
+                    Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}
+                  </div>
+                  <button
+                    onClick={() => {
+                      console.log('Manual refresh triggered');
+                      refetchCart().then(() => {
+                        setLastUpdated(new Date());
+                        toast.success('Đã cập nhật giỏ hàng!');
+                      });
+                    }}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                    title="Làm mới giỏ hàng"
+                  >
+                    <ArrowPathIcon className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    <span className="hidden sm:inline">Làm mới</span>
+                  </button>
+                </div>
+
+                {/* Clear Cart Button */}
+                {!isEmpty && (
+                  <button
+                    onClick={handleClearCart}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 border border-red-200"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline">Xóa tất cả</span>
+                    <span className="sm:hidden">Xóa</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Loading State */}
@@ -164,6 +241,14 @@ const CartPage = () => {
                   <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
                   <p className="text-gray-600 text-lg">Đang tải giỏ hàng...</p>
                 </div>
+              </div>
+            )}
+
+            {/* Refresh Status Indicator */}
+            {isLoading && items.length > 0 && (
+              <div className="fixed top-4 right-4 z-50 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+                <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <span className="text-sm font-medium">Đang cập nhật giỏ hàng...</span>
               </div>
             )}
 

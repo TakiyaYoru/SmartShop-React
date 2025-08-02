@@ -9,6 +9,7 @@ import { router } from './router';
 import { client } from './lib/apollo';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { WishlistProvider } from './contexts/WishlistContext';
 
 import './index.css';
 
@@ -17,8 +18,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ApolloProvider client={client}>
       <AuthProvider>
         <CartProvider>
-          <RouterProvider router={router} />
-          <Toaster position="top-right" />
+          <WishlistProvider>
+            <RouterProvider router={router} />
+            <Toaster position="top-right" />
+          </WishlistProvider>
         </CartProvider>
       </AuthProvider>
     </ApolloProvider>
